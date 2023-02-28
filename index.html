@@ -44,7 +44,7 @@
         const jsonlData = [];
         jsonlData.push({
           user_name: "You",
-          character_name: botName,
+          character_name: botName || 'bot',
           create_date: Date.now(),
         });
         for (let i = 0; i < chat.length; i++) {
