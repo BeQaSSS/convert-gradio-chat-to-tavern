@@ -32,8 +32,8 @@
         let botName = null;
         for (let i = 0; i < chat.length; i++) {
           const [sender, message] = chat[i].split(":");
-          if (sender.trim() === "bot") {
-            botName = message.trim();
+          if (sender.trim() !== "You") {
+            botName = sender.trim();
             break;
           }
         }
@@ -50,11 +50,10 @@
         for (let i = 0; i < chat.length; i++) {
           const [sender, message] = chat[i].split(":");
           const isUser = sender.trim() === "You";
-          const isName = sender.trim() === "bot";
           jsonlData.push({
             name: sender.trim(),
             is_user: isUser,
-            is_name: isName,
+            is_name: true,
             send_date: Date.now(),
             mes: message.trim(),
           });
