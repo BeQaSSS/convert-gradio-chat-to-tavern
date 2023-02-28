@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JSON to JSONL Converter</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <h1>JSON to JSONL Converter</h1>
+    <p>Select a JSON file to upload:</p>
+    <input type="file" id="fileInput" accept=".json" />
+    <br /><br />
+    <button onclick="convertJSON()">Convert to JSONL</button>
+
+    <script>
+      function convertJSON() {
+        const fileInput = document.getElementById("fileInput");
+        const file = fileInput.files[0];
+
+        const reader = new FileReader();
+        reader.readAsText(file);
+
+        reader.onload = function () {
+          const chatData = JSON.parse(reader.result);
+          const botName = getBotName(chatData.chat);
+          const jsonlData = convertToJSONL(chatData.chat, botName);
+          downloadJSONL(jsonlData);
+        };
+      }
+
+      function getBotName(chat) {
+        let botName = null;
+        for (let i = 0; i < chat.length; i++) {
+          const [sender, message] = chat[i].split(":");
+          if (sender.trim() === "bot") {
+            botName = message.trim();
+            break;
+          }
+        }
+        return botName;
+      }
+
+      function convertToJSONL(chat, botName) {
+        const jsonlData = [];
+        jsonlData.push({
+          user_name: "You",
+          character_name: botName,
+          create_date: Date.now(),
+        });
+        for (let i = 0; i < chat.length; i++) {
+          const [sender, message] = chat[i].split(":");
+          const isUser = sender.trim() === "You";
+          const isName = sender.trim() === "bot";
+          jsonlData.push({
+            name: sender.trim(),
+            is_user: isUser,
+            is_name: isName,
+            send_date: Date.now(),
+            mes: message.trim(),
+          });
+        }
+        return jsonlData;
+      }
+
+      function downloadJSONL(jsonlData) {
+        const filename = "chat.jsonl";
+        const fileContent = jsonlData
+          .map((obj) => JSON.stringify(obj))
+          .join("\n");
+        const blob = new Blob([fileContent], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.download = filename;
+        link.href = url;
+        link.click();
+      }
+    </script>
+  </body>
+</html>
